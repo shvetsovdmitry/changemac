@@ -21,11 +21,15 @@ DEVICE="wlan0"
 
 # Help message.
 usage() {
-	printf "ChangeMAC - Macchanger wrapper (2019 May 3) v0.5\n\n"
+	printf "ChangeMAC - Macchanger wrapper (2019 May 3) v0.5a\n\n"
+	printf "Makes it easier to change the MAC. Unite commands for 'macchanger' and 'ip link' (changing interface modes).\n\n"
 	printf "Usage: sudo changemac [arguments]\tChange MAC for specified device\n"
-	printf "   or: sudo changemac [arguments] -v\tVerbose output\n\n"
+	printf "   or: sudo changemac [arguments] -v\tVerbose output\n"
+	printf "   or: sudo changemac -h\t\tShow help information\n\n"
+	printf "Arguments:\n"
 	printf "   -m <MAC>\tMAC to use (Default: 0A:1B:2C:3D:4E:5F) \n"
 	printf "   -d <device>\tDevice to use (Default: wlan0) \n"
+	printf "   -p\t\tReset MAC to default (permanent)\n"
 	printf "   -r\t\tRestart network-manager \n"
 	printf "   -v\t\tVerbose output \n"
 	printf "   -h\t\tShow help information \n"
@@ -100,7 +104,7 @@ do
 done
 
 if [ -z "$MAC" ]; then
-	error_output "MAC is not provided"
+	error_output "MAC is not provided!"
 	exit 1
 fi 
 
