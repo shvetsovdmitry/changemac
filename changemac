@@ -2,6 +2,8 @@
 
 # Do we need to restart network-manager service?
 restart_service=false
+# Do we need to reset MAC to permanent?
+reset_to_permanent=false
 # Do we need to output macchanger's messages?
 verbose=false
 # Red escape character.
@@ -10,7 +12,6 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 # Orange escape character.
 ORANGE='\033[0;33m'
-
 NC='\033[0m'
 # Default MAC.
 MAC="0A:1B:2C:3D:4E:5F"
@@ -53,13 +54,24 @@ change_mac() {
 	success_output "Changing MAC."
 	if $verbose ; then
 		warning_output "Verbose mode: ON"
-		sudo macchanger -m $MAC $DEVICE
+		if $reset_to_permanent ; then
+			sudo macchanger -p $DEVICE
+			success_output "Reset to default MAC."
+		else
+			sudo macchanger -m $MAC $DEVICE
+		fi
 	else
-		sudo macchanger -m $MAC $DEVICE >/dev/null 2>&1
+		if $reset_to_permanent ; then
+			sudo macchanger -p $DEVICE >/dev/null 2>&1
+			success_output "Reset to default MAC."
+		else
+			sudo macchanger -m $MAC $DEVICE >/dev/null 2>&1
+		fi
 	fi
 
 	success_output "Setting network up."
 	sudo ip link set $DEVICE up
+
 	if $restart_service ; then
 		warning_output "Network-manager restarting."
 		sudo service network-manager restart
@@ -70,16 +82,17 @@ change_mac() {
 
 
 # Assigning default variables
-if ( ! getopts ":md:rvh" opt); then
+if ( ! getopts ":md:prvh" opt); then
 	warning_output "Using default MAC (0A:1B:2C:3D:4E:5F)"
 fi
 
-options=':md:rvh'
+options=':md:prvh'
 while getopts $options option
 do
 	case $option in
 		m ) MAC=$OPTARG; warning_output "Using MAC $MAC";;
 		d ) DEVICE=$OPTARG; warning_output "Using device $DEVICE";;
+		p ) reset_to_permanent=true; warning_output "Reset to default MAC.";;
 		r ) restart_service=true;;
 		v ) verbose=true;;
 		h ) usage; exit;;
