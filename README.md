@@ -4,16 +4,16 @@ ChangeMAC - Macchanger wrapper (2019 May 3) v0.5b
 ## Installation:
 
 1) Clone the repo:
-> > `git clone https://github.com/shvetsovdmitry/changemac`
+> `git clone https://github.com/shvetsovdmitry/changemac`
 
 2) Go into directory:
-> > `cd changemac`
+> `cd changemac`
 
-> 3) Copy code file to `/usr/bin`:
-> > `sudo cp changemac /usr/bin`
+3) Copy code file to `/usr/bin`:
+> `sudo cp changemac /usr/bin`
 
 > 4) Launch from everywhere:
-> > `sudo changemac [options]`
+> `sudo changemac [options]`
 
 ## Options:
 
