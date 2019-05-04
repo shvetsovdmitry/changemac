@@ -12,7 +12,7 @@ ChangeMAC - Macchanger wrapper (2019 May 3) v0.5b
 3) Copy code file to `/usr/bin`:
 > `sudo cp changemac /usr/bin`
 
-> 4) Launch from everywhere:
+4) Launch from everywhere:
 > `sudo changemac [options]`
 
 ## Options:
