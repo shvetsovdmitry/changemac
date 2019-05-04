@@ -32,7 +32,7 @@ usage() {
 	printf "Usage: sudo changemac [arguments]\tChange MAC for specified device\n"
 	printf "   or: sudo changemac [arguments] -v\tVerbose output\n"
 	printf "   or: sudo changemac -h\t\tShow help information\n\n"
-	printf "Arguments:\n"
+	printf "Options:\n"
 	printf "   -m <MAC>\tMAC to use (Default: 0A:1B:2C:3D:4E:5F) \n"
 	printf "   -d <device>\tDevice to use (Default: wlan0) \n"
 	printf "   -p\t\tReset MAC to default (permanent) \n"
@@ -41,7 +41,6 @@ usage() {
 	printf "   -A\t\tSet random vendor MAC of any kind \n"
 	printf "   -s\t\tRestart network-manager \n"
 	printf "   -v\t\tVerbose output \n"
-	# printf "   -q\t\tQuiet mode \n"
 	printf "   -h\t\tShow help information \n"
 }
 
@@ -136,7 +135,6 @@ do
 		A ) random=true; warning_output "Setting random vendor MAC of any kind.";;
 		s ) restart_service=true;;
 		v ) verbose=true;;
-		# q ) exec 3>/dev/null;;
 		h ) usage; exit;;
 	esac
 done
