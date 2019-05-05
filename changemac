@@ -29,9 +29,7 @@ DEVICE="wlan0"
 usage() {
 	printf "ChangeMAC - Macchanger wrapper (2019 May 3) v0.5c\n\n"
 	printf "Makes it easier to change the MAC. Unite commands for 'macchanger' and 'ip link' (changing interface modes).\n\n"
-	printf "Usage: sudo changemac [arguments]\tChange MAC for specified device\n"
-	printf "   or: sudo changemac [arguments] -v\tVerbose output\n"
-	printf "   or: sudo changemac -h\t\tShow help information\n\n"
+	printf "Usage: sudo changemac [options]\n\n"
 	printf "Options:\n"
 	printf "   -m <MAC>\tMAC to use (Default: 0A:1B:2C:3D:4E:5F) \n"
 	printf "   -d <device>\tDevice to use (Default: wlan0) \n"
@@ -41,21 +39,24 @@ usage() {
 	printf "   -A\t\tSet random vendor MAC of any kind \n"
 	printf "   -s\t\tRestart network-manager \n"
 	printf "   -v\t\tVerbose output \n"
-	printf "   -h\t\tShow help information \n"
+	printf "   -h\t\tShow help information \n\n"
+	printf "Report bugs to https://github.com/shvetsovdmitry/changemac/issues\n"
 }
 
 
 check_for_updates() {
+	warning_output "Checking for updates.."
 	if [ -d .git/ ]; then
-		status=exec >/dev/null >(sudo git pull)
+		status="$(sudo git diff origin/master)"
 		if [[ $status == *"Already up to date"* ]]; then
 			success_output "You're using the latest version"
 		else
 			warning_output "Updating.."
-			exec >/dev/null >(sudo git pull)
+			sudo git pull
+			success_output "Succesfully updated."
 		fi
 	else
-		warning_output "Not a git repo. You need to check and install updates manually"
+		warning_output "Not a git repo. You need to check and install updates manually."
 	fi
 }
 
@@ -88,36 +89,48 @@ change_mac() {
 	if $verbose ; then
 		warning_output "Verbose mode: ON"
 		if $reset_to_permanent ; then
+			warning_output "Reset to default MAC."
 			sudo macchanger -p $DEVICE
 			success_output "Reset to default MAC."
 		elif $fully_random ; then
+			warning_output "Setting fully random MAC.";
 			sudo macchanger -r $DEVICE
 			success_output "Randomized MAC."
 		elif $random_same_kind ; then
+			warning_output "Setting random vendor MAC of the same kind."
 			sudo macchanger -a $DEVICE
 			success_output "Randomized vendor MAC of same kind."
 		elif $random ; then
+			warning_output "Setting random vendor MAC of any kind."
 			sudo macchanger -A $DEVICE
 			success_output "Randomized vendor MAC of any kind."
 		else
+			warning_output "Using MAC $MAC"
 			sudo macchanger -m $MAC $DEVICE
+			success_output "Succesfully changed MAC to $MAC."
 		fi
 	# If Non-verbose mode.
 	else
 		if $reset_to_permanent ; then
+			warning_output "Reset to default MAC."
 			sudo macchanger -p $DEVICE >/dev/null 2>&1
 			success_output "Reset to default MAC."
 		elif $fully_random ; then
+			warning_output "Setting fully random MAC.";
 			sudo macchanger -r $DEVICE >/dev/null 2>&1
 			success_output "Randomized MAC."
 		elif $random_same_kind ; then
+			warning_output "Setting random vendor MAC of the same kind."
 			sudo macchanger -a $DEVICE >/dev/null 2>&1
 			success_output "Randomized vendor MAC of same kind."
 		elif $random ; then
+			warning_output "Setting random vendor MAC of any kind."
 			sudo macchanger -A $DEVICE >/dev/null 2>&1
 			success_output "Randomized vendor MAC of any kind."
 		else
+			warning_output "Using MAC $MAC"
 			sudo macchanger -m $MAC $DEVICE >/dev/null 2>&1
+			success_output "Succesfully changed MAC to $MAC."
 		fi
 	fi
 
@@ -142,12 +155,12 @@ options=':md:praAsvhq'
 while getopts $options option
 do
 	case $option in
-		m ) MAC=$OPTARG; warning_output "Using MAC $MAC";;
+		m ) MAC=$OPTARG;;
 		d ) DEVICE=$OPTARG; warning_output "Using device $DEVICE";;
-		p ) reset_to_permanent=true; warning_output "Reset to default MAC.";;
-		r ) fully_random=true; warning_output "Setting fully random MAC.";;
-		a ) random_same_kind=true; warning_output "Setting random vendor MAC of the same kind.";;
-		A ) random=true; warning_output "Setting random vendor MAC of any kind.";;
+		p ) reset_to_permanent=true;;
+		r ) fully_random=true;;
+		a ) random_same_kind=true;;
+		A ) random=true;;
 		s ) restart_service=true;;
 		v ) verbose=true;;
 		h ) usage; exit;;
