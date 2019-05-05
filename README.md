@@ -6,7 +6,7 @@ ChangeMAC - Macchanger wrapper (2019 May 3) v0.5c
 1) Clone the repo:
 > `git clone https://github.com/shvetsovdmitry/changemac`
 
-2) Go into directory:
+2) Go into the directory:
 > `cd changemac`
 
 3) Copy code file to `/usr/bin`:
