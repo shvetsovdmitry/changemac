@@ -27,7 +27,7 @@ DEVICE="wlan0"
 
 # Help message.
 usage() {
-	printf "ChangeMAC - Macchanger wrapper (2019 May 3) v0.5a\n\n"
+	printf "ChangeMAC - Macchanger wrapper (2019 May 3) v0.5c\n\n"
 	printf "Makes it easier to change the MAC. Unite commands for 'macchanger' and 'ip link' (changing interface modes).\n\n"
 	printf "Usage: sudo changemac [arguments]\tChange MAC for specified device\n"
 	printf "   or: sudo changemac [arguments] -v\tVerbose output\n"
@@ -42,6 +42,21 @@ usage() {
 	printf "   -s\t\tRestart network-manager \n"
 	printf "   -v\t\tVerbose output \n"
 	printf "   -h\t\tShow help information \n"
+}
+
+
+check_for_updates() {
+	if [ -d .git/ ]; then
+		status=exec >/dev/null >(sudo git pull)
+		if [[ $status == *"Already up to date"* ]]; then
+			success_output "You're using the latest version"
+		else
+			warning_output "Updating.."
+			exec >/dev/null >(sudo git pull)
+		fi
+	else
+		warning_output "Not a git repo. You need to check and install updates manually"
+	fi
 }
 
 
@@ -140,4 +155,5 @@ do
 done
 
 # Calling the main function.
+check_for_updates
 change_mac
