@@ -4,30 +4,30 @@
 # Help message.
 usage() {
 	cat <<- EndOfMessage
-	ChangeMAC - Macchanger wrapper (2019 May 3) v0.5c
+	ChangeMAC - Macchanger wrapper (2019 May 3) v0.6
 
-	Makes it easier to change the MAC. Unite commands for 'macchanger' and 'ip link' (changing interface modes).
+	Makes it easier to change the MAC. Unite commands for 'macchanger' and 'ip link'/'netsh' (changing interface modes).
 
-	Usage: sudo changemac [options]
+	Usage: sudo changemac [options] device
 
 	Options:
-	    -m <MAC>        MAC to use (Default: 0A:1B:2C:3D:4E:5F)
-	    -d <device>     Device to use.
-	    -p              Reset MAC to default (permanent)
-	    -r              Set fully random MAC
-	    -a              Set random vendor MAC of the same kind
-	    -A              Set random vendor MAC of any kind
-	    -s              Restart network-manager
-	    -v              Verbose output
-	    -h              Show help information
+	    -m <MAC>, --mac <MAC>        MAC to use (Default: 0A:1B:2C:3D:4E:5F)
+	    -p, --permanent              Reset MAC to default (permanent)
+	    -r, --fully-random           Set fully random MAC
+	    -a, --same-kind              Set random vendor MAC of the same kind
+	    -A, --any-kind               Set random vendor MAC of any kind
+	    -s, --service                Restart network-manager
+	    -v, --verbose                Verbose output
+	    -h, --help                   Show help information
 
-    https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
+
 	Report bugs to https://github.com/shvetsovdmitry/changemac/issues
 	EndOfMessage
 }
 
 
-init() {
+# Checking OS type (Windows/Unix)
+check_os() {
 	uname_out="$(uname -s)"
 	case "${uname_out}" in
 		Linux* ) SUDO="sudo";;
@@ -35,29 +35,6 @@ init() {
 		* ) SUDO="";;
 	esac
 	OS=$uname_out
-	echo $OS
-	# Do we need to restart network-manager service?
-	restart_service=false
-	# Do we need to reset MAC to permanent?
-	reset_to_permanent=false
-	# Do we need a fully random MAC?
-	fully_random=false
-	# Random vendor MAC of the same kind.
-	random_same_kind=false
-	# Random vendor MAC of any kind.
-	random=false
-	# Do we need to output macchanger's messages?
-	verbose=false
-	# Red escape character.
-	RED='\033[0;31m'
-	# Green escape character.
-	GREEN='\033[0;32m'
-	# Orange escape character.
-	ORANGE='\033[0;33m'
-	NC='\033[0m'
-	# Default MAC.
-	MAC="0A:1B:2C:3D:4E:5F"
-
 }
 
 
@@ -101,6 +78,7 @@ error_output() {
 
 # Off verbose mode.
 set_verbose_mode_off() {
+	echo "Setting verbose mode OFF"
 	exec 2>/dev/null
 	return 0
 }
@@ -132,26 +110,26 @@ change_mac() {
 
 	success_output "Changing MAC."
 	# If VERBOSE mode OFF.
-	if [ "$verbose" = false ] ; then
+	if [ "$VERBOSE" = false ] ; then
 		set_verbose_mode_off
 	fi
 	# Reset to permanent MAC.
-	if $reset_to_permanent ; then
+	if $PERMANENT ; then
 		warning_output "Reset to default MAC."
 		$SUDO macchanger -p $DEVICE
 		success_output "Reset to default MAC."
 	# Randomize MAC address.
-	elif $fully_random ; then
+	elif $FULLY_RANDOM ; then
 		warning_output "Setting fully random MAC.";
 		$SUDO macchanger -r $DEVICE
 		success_output "Randomized MAC."
 	# Randomize vendor MAC of the same kind. 
-	elif $random_same_kind ; then
+	elif $RANDOM_SAME_KIND ; then
 		warning_output "Setting random vendor MAC of the same kind."
 		$SUDO macchanger -a $DEVICE
 		success_output "Randomized vendor MAC of same kind."
 	# Randomize vendor MAC of any kind.
-	elif $random ; then
+	elif $RANDOM_ANY_KIND ; then
 		warning_output "Setting random vendor MAC of any kind."
 		$SUDO macchanger -A $DEVICE
 		success_output "Randomized vendor MAC of any kind."
@@ -166,7 +144,7 @@ change_mac() {
 	manage_interface up
 
 	# If user want to restart service.
-	if [ $restart_service ] && ([ $OS == *"Linux"* ] || [ $OS == *"Darwin"* ]) ; then
+	if [ $RESTART_SERVICE ] && ([ $OS == *"Linux"* ] || [ $OS == *"Darwin"* ]) ; then
 		warning_output "Network-manager restarting."
 		$SUDO service network-manager restart
 		success_output "Success!"
@@ -177,32 +155,85 @@ change_mac() {
 }
 
 
-# Assigning default variables
-if ( ! getopts ":md:praAsvhq" opt); then
-	warning_output "Using default MAC (0A:1B:2C:3D:4E:5F)"
-fi
+#### Variables #################################################################
 
-options=':md:praAsvhq'
-while getopts $options option
-do
-	case $option in
-		m ) MAC=$OPTARG;;
-		d ) DEVICE=$OPTARG; warning_output "Using device $DEVICE";;
-		p ) reset_to_permanent=true;;
-		r ) fully_random=true;;
-		a ) random_same_kind=true;;
-		A ) random=true;;
-		s ) restart_service=true;;
-		v ) verbose=true;;
-		h ) usage; exit;;
-	esac
+# Do we need to restart network-manager service?
+RESTART_SERVICE=false
+# Do we need to reset MAC to permanent?
+PERMANENT=false
+# Do we need a fully random MAC?
+FULLY_RANDOM=false
+# Random vendor MAC of the same kind.
+RANDOM_SAME_KIND=false
+# Random vendor MAC of any kind.
+RANDOM_ANY_KIND=false
+# Do we need to output macchanger's messages?
+VERBOSE=false
+# Red escape character.
+RED='\033[0;31m'
+# Green escape character.
+GREEN='\033[0;32m'
+# Orange escape character.
+ORANGE='\033[0;33m'
+NC='\033[0m'
+# Default MAC.
+MAC="0A:1B:2C:3D:4E:5F"
+
+################################################################################
+
+
+#### Passing arguments #########################################################
+while [ -n "$1" ]; do
+    # Copy $1 to modify it
+    ARG="$1"
+    # Detect argument termination
+    if [ x"$ARG" = x"--" ]; then
+        shift
+        for ARG ; do
+            REMAINS="$REMAINS \"$ARG\""
+        done
+
+        break
+    fi
+    # Parse current arguments
+    while [ x"$ARG" != x"-" ] ; do
+        case "$ARG" in
+        	# Handle --flag=value args like this
+            -m=* | --mac=* ) MAC="${ARG#*=}"; shift;;
+            # and --flag value args like this
+            -m* | --mac ) MAC="$2"; shift;;
+            -p* | --permanent ) PERMANENT=true;;
+            -r* | --fully-random ) FULLY_RANDOM=true;;
+			-a* | --same-kind ) RANDOM_SAME_KIND=true;;
+			-A* | --any-kind ) RANDOM_ANY_KIND=true;;
+			-s* | --service ) RESTART_SERVICE=true;;
+			-v* | --verbose ) VERBOSE=true;;
+			-h* | --help ) usage; exit;;
+            # Anything unknown is recorded for later
+            * ) REMAINS="$REMAINS \"$ARG\""; break;;
+        esac
+	        # Check for multiple short arguments
+	        # NOTICE: be sure to update this pattern to match valid ARGions
+	        NEXTARG="${ARG#-[praAsv]}" # try removing single short ARG
+	        if [ x"$ARG" != x"$NEXTARG" ] ; then
+                ARG="-$NEXTARG"  # multiple short ARGs, keep going
+	        else
+                break  # long form, exit inner loop
+	        fi
+    done
+    # Done with that param. move to next
+    shift
 done
+# Set the non-parameters back into the positional parameters ($1 $2 ..)
+eval set -- $REMAINS
 
+################################################################################
 
+# In REMAINS should remain only device.
+DEVICE=$REMAINS
 
-
-init
+check_os
 # Calling update functions
-check_for_updates
+# check_for_updates
 # Calling the main function.
 change_mac
