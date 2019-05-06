@@ -1,5 +1,12 @@
 # ChangeMAC
+
 ChangeMAC - [macchanger](https://github.com/alobbs/macchanger) wrapper (2019 May 3) v0.6
+
+![license](https://img.shields.io/github/license/shvetsovdmitry/changemac.svg?style=flat-square)
+![version](https://img.shields.io/github/release/shvetsovdmitry/changemac.svg?style=flat-square)
+![commit activity](https://img.shields.io/github/commit-activity/w/shvetsovdmitry/changemac.svg?style=flat-square)
+![latest commit](https://img.shields.io/github/last-commit/shvetsovdmitry/changemac.svg?style=flat-square)
+![release date](https://img.shields.io/github/release-date/shvetsovdmitry/changemac.svg?style=flat-square)
 
 ## Installation:
 
