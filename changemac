@@ -12,7 +12,7 @@ usage() {
 
 	Options:
 	    -m <MAC>        MAC to use (Default: 0A:1B:2C:3D:4E:5F)
-	    -d <device>     Device to use (Default: wlan0)
+	    -d <device>     Device to use.
 	    -p              Reset MAC to default (permanent)
 	    -r              Set fully random MAC
 	    -a              Set random vendor MAC of the same kind
@@ -21,6 +21,7 @@ usage() {
 	    -v              Verbose output
 	    -h              Show help information
 
+    https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
 	Report bugs to https://github.com/shvetsovdmitry/changemac/issues
 	EndOfMessage
 }
@@ -33,8 +34,8 @@ init() {
 		Darwin* ) SUDO="sudo";;
 		* ) SUDO="";;
 	esac
-	echo $SUDO
-
+	OS=$uname_out
+	echo $OS
 	# Do we need to restart network-manager service?
 	restart_service=false
 	# Do we need to reset MAC to permanent?
@@ -56,9 +57,6 @@ init() {
 	NC='\033[0m'
 	# Default MAC.
 	MAC="0A:1B:2C:3D:4E:5F"
-	# Device.
-	DEVICE="wlan0"
-
 
 }
 
@@ -82,31 +80,47 @@ check_for_updates() {
 
 # Everything is going fine.
 success_output() {
-	printf "[${GREEN}+${NC}] $1 \n" 	
+	printf "[${GREEN}+${NC}] $1 \n"
+	return 0
 }
 
 
 # Warning message.
 warning_output() {
 	printf "[${ORANGE}!${NC}] $1 \n"
+	return 0
 }
 
 
 # Error message.
 error_output() {
 	printf "[${RED}-${NC}] $1 \n"
+	return 0
 }
 
 
 # Off verbose mode.
 set_verbose_mode_off() {
 	exec 2>/dev/null
+	return 0
 }
 
 
 # Manages the network interfaces.
 manage_interface () {
-	if [ ! $OS==""
+	if [ $OS == *"Linux"* ] || [ $OS == *"Darwin"* ]; then
+		if [ $1 == up ]; then
+			sudo ip link set $DEVICE down
+		elif [ $1 == down ]; then
+			sudo ip link set $DEVICE
+		fi
+	else
+		if [ $1 == up ]; then
+			netsh interface set interface name="$DEVICE" admin=enable
+		elif [ $1 == down ]; then
+			netsh interface set interface name="$DEVICE" admin=disable
+		fi
+	fi
 }
 
 
@@ -114,7 +128,7 @@ manage_interface () {
 # Main function.
 change_mac() {
 	success_output "Setting network down."
-	$SUDO ip link set $DEVICE down
+	manage_interface down
 
 	success_output "Changing MAC."
 	# If VERBOSE mode OFF.
@@ -149,17 +163,17 @@ change_mac() {
 	fi
 
 	success_output "Setting network up."
-	$SUDO ip link set $DEVICE up
+	manage_interface up
 
 	# If user want to restart service.
-	if $restart_service ; then
+	if [ $restart_service ] && ([ $OS == *"Linux"* ] || [ $OS == *"Darwin"* ]) ; then
 		warning_output "Network-manager restarting."
 		$SUDO service network-manager restart
 		success_output "Success!"
 	fi
 	success_output "Quitting..."
 
-	exit 0
+	return 0
 }
 
 
@@ -183,6 +197,8 @@ do
 		h ) usage; exit;;
 	esac
 done
+
+
 
 
 init
