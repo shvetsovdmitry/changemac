@@ -38,6 +38,50 @@ check_os() {
 }
 
 
+# Checking device for availability.
+check_device() {
+	if [[ $OS == *"Linux"* ]] || [[ $OS == *"Darwin"* ]]; then
+		ifc="$(sudo ifconfig $DEVICE)"
+		if [[ ${ifc} -ne *"$DEVICE"* ]]; then
+			error_output "Device $DEVICE not found! Quitting.."
+			exit 1
+		fi
+	else
+		DEVICE=${DEVICE%\"}
+		DEVICE=${DEVICE##*\"}
+		echo $DEVICE
+		net_sh="$(netsh interface show interface)"
+		echo "${net_sh}"
+		if [[ ! ${net_sh} == *"$DEVICE"* ]]; then
+			error_output "Device $DEVICE not found! Quitting.."
+			exit 1
+		else
+			success_output "Device $DEVICE found! Continuing job!"
+		fi
+	fi
+}
+
+
+# Checking installed utilities.
+check_utils() {
+	warning_output "Checking installed utilities.."
+	macchanger_output="$($SUDO macchanger --version)"
+	git_output="$(git --version)"
+	if [[ -z "${macchanger_output}" ]]; then
+		error_output "Macchanger is not installed. Quitting.."
+		exit 1
+	else
+		success_output ${macchanger_output}
+	fi
+	if [[ -z "${git_output}" ]]; then
+		warning_output "Git is not installed. You will not be able to receive updates without git."
+	else
+		success_output "${git_output}"
+	fi
+}
+
+
+# Checking updates from GitHUB.
 check_for_updates() {
 	warning_output "Checking for updates.."
 	if [ -d .git/ ]; then
@@ -76,10 +120,10 @@ error_output() {
 }
 
 
-# Off verbose mode.
-set_verbose_mode_off() {
-	echo "Setting verbose mode OFF"
-	exec 2>/dev/null
+# ON verbose mode.
+set_verbose_mode_ON() {
+	echo "Setting verbose mode ON"
+	exec 2>&1
 	return 0
 }
 
@@ -181,6 +225,8 @@ MAC="0A:1B:2C:3D:4E:5F"
 
 ################################################################################
 
+# Mute output.
+exec 2>/dev/null
 
 #### Passing arguments #########################################################
 while [ -n "$1" ]; do
@@ -229,11 +275,22 @@ eval set -- $REMAINS
 
 ################################################################################
 
+
+if $VERBOSE; then
+	set_verbose_mode_ON
+fi
+
+
 # In REMAINS should remain only device.
 DEVICE=$REMAINS
 
+# Checking type of OS.
 check_os
-# Calling update functions
-# check_for_updates
+# Checking if every utilities installed.
+check_utils
+# Checking if device available.
+check_device
+# Calling update function.
+check_for_updates
 # Calling the main function.
 change_mac
