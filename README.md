@@ -1,5 +1,5 @@
 # ChangeMAC
-ChangeMAC - Macchanger wrapper (2019 May 3) v0.5c
+ChangeMAC - Macchanger wrapper (2019 May 3) v0.6
 
 ## Installation:
 
@@ -13,12 +13,11 @@ ChangeMAC - Macchanger wrapper (2019 May 3) v0.5c
 > `sudo cp changemac /usr/bin`
 
 4) Launch from everywhere:
-> `sudo changemac [options]`
+> `sudo changemac [options] device`
 
 ## Options:
 
 * `-m \<MAC\>` - MAC to use (Default: 0A:1B:2C:3D:4E:5F) 
-* `-d \<device\>` -	Device to use (Default: wlan0) 
 * `-p` - Reset MAC to default (permanent) 
 * `-r` - Set fully random MAC 
 * `-a` - Set random vendor MAC of the same kind 
