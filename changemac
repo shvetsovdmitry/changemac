@@ -27,20 +27,26 @@ DEVICE="wlan0"
 
 # Help message.
 usage() {
-	printf "ChangeMAC - Macchanger wrapper (2019 May 3) v0.5c\n\n"
-	printf "Makes it easier to change the MAC. Unite commands for 'macchanger' and 'ip link' (changing interface modes).\n\n"
-	printf "Usage: sudo changemac [options]\n\n"
-	printf "Options:\n"
-	printf "   -m <MAC>\tMAC to use (Default: 0A:1B:2C:3D:4E:5F) \n"
-	printf "   -d <device>\tDevice to use (Default: wlan0) \n"
-	printf "   -p\t\tReset MAC to default (permanent) \n"
-	printf "   -r\t\tSet fully random MAC \n"
-	printf "   -a\t\tSet random vendor MAC of the same kind \n"
-	printf "   -A\t\tSet random vendor MAC of any kind \n"
-	printf "   -s\t\tRestart network-manager \n"
-	printf "   -v\t\tVerbose output \n"
-	printf "   -h\t\tShow help information \n\n"
-	printf "Report bugs to https://github.com/shvetsovdmitry/changemac/issues\n"
+	cat <<- EndOfMessage
+	ChangeMAC - Macchanger wrapper (2019 May 3) v0.5c
+
+	Makes it easier to change the MAC. Unite commands for 'macchanger' and 'ip link' (changing interface modes).
+
+	Usage: sudo changemac [options]
+
+	Options:
+	    -m <MAC>        MAC to use (Default: 0A:1B:2C:3D:4E:5F)
+	    -d <device>     Device to use (Default: wlan0)
+	    -p              Reset MAC to default (permanent)
+	    -r              Set fully random MAC
+	    -a              Set random vendor MAC of the same kind
+	    -A              Set random vendor MAC of any kind
+	    -s              Restart network-manager
+	    -v              Verbose output
+	    -h              Show help information
+
+	Report bugs to https://github.com/shvetsovdmitry/changemac/issues
+	EndOfMessage
 }
 
 
