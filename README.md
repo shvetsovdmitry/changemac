@@ -1,5 +1,5 @@
 # ChangeMAC
-ChangeMAC - Macchanger wrapper (2019 May 3) v0.6
+ChangeMAC - [macchanger](https://github.com/alobbs/macchanger) wrapper (2019 May 3) v0.6
 
 ## Installation:
 
