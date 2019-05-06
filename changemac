@@ -1,29 +1,5 @@
 #!/bin/bash
 
-# Do we need to restart network-manager service?
-restart_service=false
-# Do we need to reset MAC to permanent?
-reset_to_permanent=false
-# Do we need a fully random MAC?
-fully_random=false
-# Random vendor MAC of the same kind.
-random_same_kind=false
-# Random vendor MAC of any kind.
-random=false
-# Do we need to output macchanger's messages?
-verbose=false
-# Red escape character.
-RED='\033[0;31m'
-# Green escape character.
-GREEN='\033[0;32m'
-# Orange escape character.
-ORANGE='\033[0;33m'
-NC='\033[0m'
-# Default MAC.
-MAC="0A:1B:2C:3D:4E:5F"
-# Device.
-DEVICE="wlan0"
-
 
 # Help message.
 usage() {
@@ -50,15 +26,52 @@ usage() {
 }
 
 
+init() {
+	uname_out="$(uname -s)"
+	case "${uname_out}" in
+		Linux* ) SUDO="sudo";;
+		Darwin* ) SUDO="sudo";;
+		* ) SUDO="";;
+	esac
+	echo $SUDO
+
+	# Do we need to restart network-manager service?
+	restart_service=false
+	# Do we need to reset MAC to permanent?
+	reset_to_permanent=false
+	# Do we need a fully random MAC?
+	fully_random=false
+	# Random vendor MAC of the same kind.
+	random_same_kind=false
+	# Random vendor MAC of any kind.
+	random=false
+	# Do we need to output macchanger's messages?
+	verbose=false
+	# Red escape character.
+	RED='\033[0;31m'
+	# Green escape character.
+	GREEN='\033[0;32m'
+	# Orange escape character.
+	ORANGE='\033[0;33m'
+	NC='\033[0m'
+	# Default MAC.
+	MAC="0A:1B:2C:3D:4E:5F"
+	# Device.
+	DEVICE="wlan0"
+
+
+}
+
+
 check_for_updates() {
 	warning_output "Checking for updates.."
 	if [ -d .git/ ]; then
-		status="$(sudo git diff origin/master)"
+		status="$($SUDO git diff origin/master)"
 		if [[ $status == *"Already up to date"* ]]; then
 			success_output "You're using the latest version"
 		else
 			warning_output "Updating.."
-			sudo git pull
+			$SUDO git pull
 			success_output "Succesfully updated."
 		fi
 	else
@@ -91,10 +104,17 @@ set_verbose_mode_off() {
 }
 
 
+# Manages the network interfaces.
+manage_interface () {
+	if [ ! $OS==""
+}
+
+
+
 # Main function.
 change_mac() {
 	success_output "Setting network down."
-	sudo ip link set $DEVICE down
+	$SUDO ip link set $DEVICE down
 
 	success_output "Changing MAC."
 	# If VERBOSE mode OFF.
@@ -104,37 +124,37 @@ change_mac() {
 	# Reset to permanent MAC.
 	if $reset_to_permanent ; then
 		warning_output "Reset to default MAC."
-		sudo macchanger -p $DEVICE
+		$SUDO macchanger -p $DEVICE
 		success_output "Reset to default MAC."
 	# Randomize MAC address.
 	elif $fully_random ; then
 		warning_output "Setting fully random MAC.";
-		sudo macchanger -r $DEVICE
+		$SUDO macchanger -r $DEVICE
 		success_output "Randomized MAC."
 	# Randomize vendor MAC of the same kind. 
 	elif $random_same_kind ; then
 		warning_output "Setting random vendor MAC of the same kind."
-		sudo macchanger -a $DEVICE
+		$SUDO macchanger -a $DEVICE
 		success_output "Randomized vendor MAC of same kind."
 	# Randomize vendor MAC of any kind.
 	elif $random ; then
 		warning_output "Setting random vendor MAC of any kind."
-		sudo macchanger -A $DEVICE
+		$SUDO macchanger -A $DEVICE
 		success_output "Randomized vendor MAC of any kind."
 	# Using user defined MAC.
 	else
 		warning_output "Using MAC $MAC"
-		sudo macchanger -m $MAC $DEVICE
+		$SUDO macchanger -m $MAC $DEVICE
 		success_output "Succesfully changed MAC to $MAC."
 	fi
 
 	success_output "Setting network up."
-	sudo ip link set $DEVICE up
+	$SUDO ip link set $DEVICE up
 
 	# If user want to restart service.
 	if $restart_service ; then
 		warning_output "Network-manager restarting."
-		sudo service network-manager restart
+		$SUDO service network-manager restart
 		success_output "Success!"
 	fi
 	success_output "Quitting..."
@@ -164,6 +184,9 @@ do
 	esac
 done
 
-# Calling the main function.
+
+init
+# Calling update functions
 check_for_updates
+# Calling the main function.
 change_mac
