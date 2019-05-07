@@ -82,8 +82,10 @@ check_device() {
 
 # Checking updates from GitHUB.
 check_for_updates() {
+	SOURCE="${BASH_SOURCE[0]}"
+	DIR="$(cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd)"
 	warning_output "Checking for updates.."
-	if [ -d .git/ ]; then
+	if [ -d "$DIR/.git/" ]; then
 		status="$($SUDO git diff origin/master)"
 		if [[ -z ${status} ]]; then
 			success_output "You're using the latest version"
