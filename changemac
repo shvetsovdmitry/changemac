@@ -289,9 +289,9 @@ DEVICE=$REMAINS
 check_os
 # Checking if every utilities installed.
 check_utils
-# Checking if device available.
-check_device
 # Calling update function.
 check_for_updates
+# Checking if device available.
+check_device
 # Calling the main function.
 # change_mac
