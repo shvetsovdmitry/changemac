@@ -85,7 +85,7 @@ check_for_updates() {
 	warning_output "Checking for updates.."
 	if [ -d .git/ ]; then
 		status="$($SUDO git diff origin/master)"
-		if [[ ${status} -eq *"Already up to date"* ]]; then
+		if [[ -z ${status} ]]; then
 			success_output "You're using the latest version"
 		else
 			warning_output "Updating.."
