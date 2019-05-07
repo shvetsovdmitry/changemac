@@ -23,15 +23,14 @@ ChangeMAC - [macchanger](https://github.com/alobbs/macchanger) wrapper (2019 May
 > `sudo changemac [options] device`
 
 ## Options:
-
-* `-m \<MAC\>` - MAC to use (Default: 0A:1B:2C:3D:4E:5F) 
-* `-p` - Reset MAC to default (permanent) 
-* `-r` - Set fully random MAC 
-* `-a` - Set random vendor MAC of the same kind 
-* `-A` - Set random vendor MAC of any kind 
-* `-s` - Restart network-manager 
-* `-v` - Verbose output 
-* `-h` - Show help information
+* `-m, --mac <MAC>` - MAC to use (Default: 0A:1B:2C:3D:4E:5F) 
+* `-p, --permanent` - Reset MAC to default (permanent) 
+* `-r, --fully-random` - Set fully random MAC 
+* `-a, --same-kind` - Set random vendor MAC of the same kind 
+* `-A, --any-kind` - Set random vendor MAC of any kind 
+* `-s, --service` - Restart network-manager 
+* `-v, --verbose` - Verbose output 
+* `-h, --help` - Show help information
 
 ## License
 MIT
