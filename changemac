@@ -27,7 +27,6 @@ usage() {
 
 # Checking OS type (Windows/Unix)
 check_os() {
-	# LANG="ru_RU.cp866"
 	uname_out="$(uname -s)"
 	case "${uname_out}" in
 		Linux* ) SUDO="sudo";;
@@ -68,15 +67,9 @@ check_device() {
 	else
 		DEVICE=${DEVICE%\"}
 		DEVICE=${DEVICE##*\"}
-				# LANG="ru_RU.UTF-8"
-		echo $DEVICE
-		# ipc="$(ipconfig)"
-		# net_sh=`cat ipconfig.txt`
-		# echo "${ipc}"
-		ipc="$(./test.bat)"
-		# echo "${ipc}"
-		# LANG="ru_RU.UTF-8"
-		if [[ ! "${ipc}" == *"$DEVICE"* ]]; then
+		ipconfig > ipconfig.txt
+		ipc="$(iconv -f CP866 -t UTF-8 ipconfig.txt)"
+		if [[ ! "${ipc}" == *$DEVICE* ]]; then
 			error_output "Device $DEVICE not found! Quitting.."
 			exit 1
 		else
@@ -294,7 +287,7 @@ check_os
 # Checking if every utilities installed.
 check_utils
 # Checking if device available.
-# check_device
+check_device
 # Calling update function.
 check_for_updates
 # Calling the main function.
