@@ -60,15 +60,16 @@ check_utils() {
 check_device() {
 	if [[ $OS == *"Linux"* ]] || [[ $OS == *"Darwin"* ]]; then
 		ifc="$(sudo ifconfig $DEVICE)"
-		if [[ ${ifc} -ne *"$DEVICE"* ]]; then
+		if [[ ! ${ifc} == *"$DEVICE"* ]]; then
 			error_output "Device $DEVICE not found! Quitting.."
 			exit 1
 		fi
 	else
 		DEVICE=${DEVICE%\"}
 		DEVICE=${DEVICE##*\"}
-		ipconfig > ipconfig.txt
-		ipc="$(iconv -f CP866 -t UTF-8 ipconfig.txt)"
+		ipconfig > .ipc
+		ipc="$(iconv -f CP866 -t UTF-8 < .ipc)"
+		rm .ipc
 		if [[ ! "${ipc}" == *$DEVICE* ]]; then
 			error_output "Device $DEVICE not found! Quitting.."
 			exit 1
