@@ -82,6 +82,8 @@ check_device() {
 
 # Checking updates from GitHUB.
 check_for_updates() {
+	local SOURCE
+	local DIR
 	SOURCE="${BASH_SOURCE[0]}"
 	DIR="$(cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd)"
 	warning_output "Checking for updates.."
@@ -90,9 +92,20 @@ check_for_updates() {
 		if [[ -z ${status} ]]; then
 			success_output "You're using the latest version"
 		else
-			warning_output "Updating.."
-			$SUDO git pull
-			success_output "Succesfully updated."
+			printf "Update? [y/N]\n"
+			local update
+			read -n 1 update
+			printf "\n"
+			if [ "$update" == "y" ] || [ "$update" == "Y" ]; then
+				warning_output "Updating.."
+				$SUDO git pull
+				success_output "Succesfully updated."
+			elif [ "$update" == 'N' ] || [ "$update" == "n" ]; then
+				warning_output "User cancelled the update.."
+			else
+				error_output "Wrong input. Repeat, please."
+				check_for_updates
+			fi			
 		fi
 	else
 		warning_output "Not a git repo. You need to check and install updates manually."
