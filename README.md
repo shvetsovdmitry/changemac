@@ -38,4 +38,4 @@ MIT
 
 Because this is an open source project, I am constantly evaluating feedback and continuing to improve upon the content.
 
-Copyright (c) 2019 Dmitry Shvetsov
+Copyright (c) 2019, Dmitry Shvetsov
