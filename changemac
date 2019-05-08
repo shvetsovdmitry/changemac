@@ -3,7 +3,7 @@
 # Help message.
 usage() {
 	cat <<- EndOfMessage
-	ChangeMAC - Macchanger wrapper (2019 May 3) v0.6
+	ChangeMAC - Macchanger wrapper (2019 May 3) v0.7
 
 	Makes it easier to change the MAC. Unite commands for 'macchanger' and 'ip link'/'netsh' (changing interface modes).
 
