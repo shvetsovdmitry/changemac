@@ -10,17 +10,18 @@ ChangeMAC - [macchanger](https://github.com/alobbs/macchanger) wrapper (2019 May
 
 ## Installation:
 
-1) Clone the repo:
-> `git clone https://github.com/shvetsovdmitry/changemac`
+### Unix:
 
-2) Go into the directory:
-> `cd changemac`
+* Clone the repo:
+> `git clone https://github.com/shvetsovdmitry/changemac ~/changemac/`
 
-3) Copy code file to `/usr/bin`:
-> `sudo cp changemac /usr/bin`
+* Add to PATH variable:
+> `export PATH=$PATH:~/changemac/changemac`
 
-4) Launch from everywhere:
+* Launch from everywhere:
 > `sudo changemac [options] device`
+
+***
 
 ## Options:
 * `-m, --mac <MAC>` - MAC to use (Default: 0A:1B:2C:3D:4E:5F) 
