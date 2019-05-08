@@ -44,7 +44,7 @@ check_utils() {
 	git_output="$(git --version)"
 	if [[ -z "${macchanger_output}" ]]; then
 		error_output "Macchanger is not installed. Quitting.."
-		# exit 1
+		exit 1
 	else
 		success_output ${macchanger_output}
 	fi
@@ -52,30 +52,6 @@ check_utils() {
 		warning_output "Git is not installed. You will not be able to receive updates without git."
 	else
 		success_output "${git_output}"
-	fi
-}
-
-
-# Checking device for availability.
-check_device() {
-	if [[ $OS == *"Linux"* ]] || [[ $OS == *"Darwin"* ]]; then
-		ifc="$(sudo ifconfig $DEVICE)"
-		if [[ ! ${ifc} == *"$DEVICE"* ]]; then
-			error_output "Device $DEVICE not found! Quitting.."
-			exit 1
-		fi
-	else
-		DEVICE=${DEVICE%\"}
-		DEVICE=${DEVICE##*\"}
-		ipconfig > .ipc
-		ipc="$(iconv -f CP866 -t UTF-8 < .ipc)"
-		rm .ipc
-		if [[ ! "${ipc}" == *$DEVICE* ]]; then
-			error_output "Device $DEVICE not found! Quitting.."
-			exit 1
-		else
-			success_output "Device $DEVICE found! Continuing job!"
-		fi
 	fi
 }
 
@@ -112,6 +88,29 @@ check_for_updates() {
 	fi
 }
 
+
+# Checking device for availability.
+check_device() {
+	if [[ $OS == *"Linux"* ]] || [[ $OS == *"Darwin"* ]]; then
+		ifc="$(sudo ifconfig $DEVICE)"
+		if [[ ! ${ifc} == *"$DEVICE"* ]]; then
+			error_output "Device $DEVICE not found! Quitting.."
+			exit 1
+		fi
+	else
+		DEVICE=${DEVICE%\"}
+		DEVICE=${DEVICE##*\"}
+		ipconfig > .ipc
+		ipc="$(iconv -f CP866 -t UTF-8 < .ipc)"
+		rm .ipc
+		if [[ ! "${ipc}" == *$DEVICE* ]]; then
+			error_output "Device $DEVICE not found! Quitting.."
+			exit 1
+		else
+			success_output "Device $DEVICE found! Continuing job!"
+		fi
+	fi
+}
 
 # Everything is going fine.
 success_output() {
@@ -307,4 +306,4 @@ check_for_updates
 # Checking if device available.
 check_device
 # Calling the main function.
-# change_mac
+change_mac
