@@ -272,10 +272,10 @@ while [ -n "$1" ]; do
             * ) REMAINS="$REMAINS \"$ARG\""; break;;
         esac
 	        # Check for multiple short arguments
-	        # NOTICE: be sure to update this pattern to match valid ARGions
-	        NEXTARG="${ARG#-[praAsv]}" # try removing single short ARG
+	        # NOTICE: be sure to update this pattern to match valid arguments
+	        NEXTARG="${ARG#-[praAsv]}" # try removing single short args
 	        if [ x"$ARG" != x"$NEXTARG" ] ; then
-                ARG="-$NEXTARG"  # multiple short ARGs, keep going
+                ARG="-$NEXTARG"  # multiple short args, keep going
 	        else
                 break  # long form, exit inner loop
 	        fi
